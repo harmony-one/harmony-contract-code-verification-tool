@@ -11,7 +11,7 @@ export const codeVerification = async (
     githubURL
   }
 ) => {
-  const taskId = "1" // Date.now() + '-' + Math.floor(Math.random() * 10000)
+  const taskId = Date.now() + '-' + Math.floor(Math.random() * 10000)
   const directory = path.join(__dirname, "../", taskId);
 
   console.log("New task", { taskId, directory });
@@ -23,12 +23,12 @@ export const codeVerification = async (
   }
 
   console.log('Cloning github...')
-  // await github.clone(githubURL, taskId)
+  await github.clone(githubURL, taskId)
   console.log('Creating truffle config...')
   await truffle.createConfiguration(solidityVersion, directory);
   await truffle.createMigration(directory, githubURL)
   console.log('Installing contract dependencies...')
-  // await truffle.installDependencies(directory)
+  await truffle.installDependencies(directory)
   console.log('Compiling...')
   await truffle.compile(directory)
   console.log('Getting compiled bytecode')

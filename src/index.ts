@@ -1,7 +1,5 @@
 import { codeVerification } from "./verification/index";
 
-import {codeVerification as v2} from "./codeVerification";
-
 const run = async () => {
  const res = await codeVerification({
     contractAddress: "one1rcs4yy4kln53ux60qdeuhhvpygn2sutn500dhw",

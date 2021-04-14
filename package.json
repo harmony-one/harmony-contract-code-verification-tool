@@ -5,11 +5,11 @@
   "main": "index.ts",
   "scripts": {
     "dev": "nodemon ./dist/index.js",
-    "build": "webpack --config webpack.config.js;",
     "rebuild": "npm run clean; npm run build",
-    "start": "cd dist && node main.js",
+    "start": "cd dist && node index.js",
     "clean": "rm -rf dist;",
-    "build:dev": "tsc -w"
+    "build:dev": "tsc -w",
+    "build": "tsc"
   },
   "author": "hypnagonia@gmail.com",
   "license": "ISC",

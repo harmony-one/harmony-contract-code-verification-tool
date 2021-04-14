@@ -1,4 +1,3 @@
-/*
 const fs = require("fs");
 const child_process = require("child_process");
 const path = require("path");
@@ -12,8 +11,7 @@ const hmy = new Harmony("https://api.s0.b.hmny.io/", {
 });
 
 const migration = (val) => {
-  const str = `const Migrations = artifacts.require("${val}");module.exports = function(deployer) {deployer.deploy(${val});};`;
-  return str;
+  return `const Migrations = artifacts.require("${val}");module.exports = function(deployer) {deployer.deploy(${val});};`;
 };
 
 const truffleConfig = (value) => {
@@ -76,7 +74,8 @@ const renamingFiles = async (filepath, uuid) => {
           })
         );
 
-        Promise.all(allFiles).then(resolve);
+        //@ts-ignore
+        Promise.all(allFiles).then(resolve());
       });
     });
   });
@@ -155,6 +154,7 @@ export async function codeVerification({
       }
       filepath = path.join(filepath, parse[v]);
     }
+    console.log('generate')
 
     console.log('generateFiles', filepath)
     await generateFiles(
@@ -168,7 +168,7 @@ export async function codeVerification({
     console.log('renamingFiles', filepath,  newId)
     await renamingFiles(filepath, newId);
 
-    const compile = await new Promise((resolve, rejects) => {
+    /*const compile = await new Promise((resolve, rejects) => {
       child_process.exec(
         `cd ${newId} && npm install && pwd && truffle compile `,
         (err, stdout, stderr) => {
@@ -180,9 +180,12 @@ export async function codeVerification({
           resolve(true);
         }
       );
-    });
+    });*/
 
     console.log('Compilation')
+    child_process.execSync(`cd ${newId} && npm install && pwd && truffle compile `)
+
+
 
     const bytecodeContract = await getSmartContractCode(contractAddress);
 
@@ -215,4 +218,4 @@ export async function codeVerification({
     await deleteFile(parse[4], newId);
     return check;
   });
-}*/
+}

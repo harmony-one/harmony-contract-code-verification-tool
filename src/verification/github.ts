@@ -20,7 +20,7 @@ export const clone = async (githubUrl, directory) => {
   execSync(`git clone ${actualUrl} ${directory}`)
 };
 
-export const getCommitHash = async () => {
-  const output = execSync(`git rev-parse HEAD`)
-  return output.toString()
+export const getCommitHash = async (directory) => {
+  const output = execSync(`cd ${directory} && git rev-parse HEAD`)
+  return output.toString().split('\n')[0]
 }

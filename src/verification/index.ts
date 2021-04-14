@@ -12,8 +12,12 @@ export const codeVerification = async (
     githubURL
   }
 ) => {
-  const taskId = '1'//Date.now() + '-' + Math.floor(Math.random() * 10000)
+  const taskId = contractAddress
   const directory = path.join(__dirname, '../', taskId)
+
+  try {
+  // todo validate address SDK hmy isAddress
+  // todo validate if folder already exist
 
   console.log('New task', { taskId, directory })
 
@@ -23,6 +27,9 @@ export const codeVerification = async (
   if (!actualBytecode || actualBytecode === '0x') {
     throw new Error(`No bytecode found for address ${contractAddress}`)
   }
+
+  const commitHash1 = await github.getCommitHash()
+  console.log(commitHash1)
 
   console.log('Cloning github...')
   try {
@@ -42,18 +49,30 @@ export const codeVerification = async (
   const { deployedBytecode, bytecode } = await truffle.getByteCode(githubURL, directory)
 
   console.log('Cleaning up...')
-  // fs.rmdirSync(directory, { recursive: true })
+  const verified = verifyByteCode(actualBytecode, deployedBytecode, solidityVersion)
 
-  return verifyByteCode(actualBytecode, deployedBytecode, solidityVersion)
-}
+  if (verified) {
+    const commitHash = await github.getCommitHash()
 
-function hex2ascii(str1) {
-  const hex = str1.toString()
-  let str = ''
-  for (let n = 0; n < hex.length; n += 2) {
-    str += String.fromCharCode(parseInt(hex.substr(n, 2), 16))
+    return {
+      verified,
+      commitHash
+    }
   }
-  return str
+
+  } catch(error) {
+    return {
+      verified: false,
+      error
+    }
+  }
+
+  fs.rmdirSync(directory, { recursive: true })
+
+  return {
+    verified: false,
+    error: 'No match'
+  }
 }
 
 

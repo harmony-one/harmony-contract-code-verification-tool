@@ -1,42 +1,35 @@
-const byteCodeStartBefore422 = '6060604052'
-const byteCodeStartAfter422 = '6080604052'
-const byteCodeEnd417 = 'a165627a7a72305820'
+import { arrayify } from '@ethersproject/bytes'
+import cbor from 'cbor'
+import fs from 'fs'
 
-const byteCodeEnd510 = 'a265627a7a72305820'
-const byteCodeEnd511 = 'a265627a7a72315820'
-
-//https://www.badykov.com/ethereum/2019/08/22/solidity-bytecode-metadata/
+// https://www.badykov.com/ethereum/2019/08/22/solidity-bytecode-metadata/
 // https://www.shawntabrizi.com/ethereum/verify-ethereum-contracts-using-web3-js-and-solc/
-export const verifyByteCode = (compiledByteCode: string, actualByteCode: string, solidityVersion: string) => {
-  const t = trimByteCode(solidityVersion)
-  return t(compiledByteCode) === t(actualByteCode)
+export function verifyByteCode(compiledByteCode: string, deployedByteCode: string, solidityVersion: string) {
+  let compiled = splitByteCode(compiledByteCode, solidityVersion)
+  let deployed = splitByteCode(deployedByteCode, solidityVersion)
+  return compiled.bytecode.equals(deployed.bytecode)
 }
 
-
-const trimByteCode = (solidityVersion: string) => (byteCode: string) => {
-  // solidityVersion = 0.1.2 0.4.17
+// according to https://docs.soliditylang.org/_/downloads/en/v0.4.6/pdf/ there is no contract metadata, a sentiment echoed by link #2 above
+// metadata is embedded in the contract starting from solidity v0.4.7 https://docs.soliditylang.org/_/downloads/en/v0.4.7/pdf/
+function splitByteCode(providedByteCode: string, solidityVersion: string) {
   const solidityMinorVersion = +(solidityVersion.split('.')[1])
   const solidityPatchVersion = +(solidityVersion.split('.')[2])
-
+  let bytecode
+  let metadata
   try {
-    let byteCodeStart, byteCodeEnd
-    if (solidityMinorVersion >= 4 && solidityPatchVersion >= 22) {
-      byteCodeStart = byteCodeStartAfter422
+    if (solidityMinorVersion >= 4 && solidityPatchVersion >= 7) {
+      let buffer = Buffer.from(arrayify(providedByteCode))
+      let metadataLength = buffer.readIntBE(buffer.length - 2, 2)  // "Since the beginning of that encoding is not easy to find, its length is added in a two-byte big-endian encoding"
+      metadata = cbor.decode(buffer.slice(buffer.length - metadataLength - 2, buffer.length - 2))
+      bytecode = buffer.slice(0, buffer.length - metadataLength - 2)
     } else {
-      byteCodeStart = byteCodeStartBefore422
+      bytecode = Buffer.from(arrayify(providedByteCode))
+      metadata = null
     }
-
-    byteCodeEnd = byteCodeEnd417
-    if (solidityMinorVersion >= 5 && solidityPatchVersion >= 10) {
-      byteCodeEnd = byteCodeEnd510
-    }
-    if (solidityMinorVersion >= 5 && solidityPatchVersion >= 11) {
-      byteCodeEnd = byteCodeEnd511
-    }
-
-    return byteCode.split(byteCodeStart)[1].split(byteCodeEnd)[0]
+    return {bytecode, metadata}
   } catch
     (e) {
-  throw new Error('Cant trim bytecode by starting pointer and meta section')
+  throw new Error('Cant split bytecode into bytecode and metadata')
   }
 }

@@ -12,7 +12,7 @@ const truffleConfig = (value) => {
       },
     },
   };
-  
+
   `
 }
 
@@ -20,18 +20,17 @@ export const createConfiguration = async (solidityVersion, directory) => {
   if (!solidityVersion) {
     throw new Error('No Solidity version specified')
   }
-  console.log(path.join(path.resolve(directory), 'truffle-config.js'))
   const config = truffleConfig(solidityVersion)
   fs.writeFileSync(path.join(path.resolve(directory), 'truffle-config.js'), config)
 }
 
 
 export const installDependencies = async (directory) => {
-  execSync(`cd ${directory} && yarn`)
+  execSync(`cd ${directory} && yarn 2>&1`)
 }
 
 export const compile = async (directory) => {
-  execSync(`cd ${directory} && truffle compile`)
+  execSync(`cd ${directory} && truffle compile 2>&1`)
 }
 
 const renameFile = (filename, inExtension, outExtension) => {

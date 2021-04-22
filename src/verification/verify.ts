@@ -9,6 +9,8 @@ export function verifyByteCode(deployedByteCode, compiledByteCode, solidityVersi
 }
 
 function arrayify(code) {
+  if (!(code.substring(0,2) == '0x'))
+    throw new Error('Bytecode does not start with 0x')
   let hex = (<string>code).substring(2)
   const result = []
     for (let i = 0; i < hex.length; i += 2) {
@@ -19,7 +21,7 @@ function arrayify(code) {
 
 // according to https://docs.soliditylang.org/_/downloads/en/v0.4.6/pdf/ there is no contract metadata, a sentiment echoed by link #2 above
 // metadata is embedded in the contract starting from solidity v0.4.7 https://docs.soliditylang.org/_/downloads/en/v0.4.7/pdf/
-function splitByteCode(providedByteCode, solidityVersion) {
+export function splitByteCode(providedByteCode, solidityVersion) {
   const solidityMinorVersion = +(solidityVersion.split('.')[1])
   const solidityPatchVersion = +(solidityVersion.split('.')[2])
   let bytecode

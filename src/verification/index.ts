@@ -41,7 +41,7 @@ export const codeVerification = async (
 
   spinner = ora('Cloning smart contract Github repository...').start()
   try {
-    await github.clone(githubURL, taskId, commitHash)
+    await github.clone(githubURL, directory, commitHash)
   } catch (e) {
     spinner.stop()
     process.exit(1)
@@ -80,7 +80,7 @@ export const codeVerification = async (
     cleanUp(directory, keep)
     return {
       verified: false,
-      error
+      error: error
     }
   }
 

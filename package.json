@@ -9,7 +9,8 @@
     "start": "cd dist && node index.js",
     "clean": "rm -rf dist;",
     "build:dev": "tsc -w",
-    "build": "tsc"
+    "build": "tsc",
+    "test": "jest"
   },
   "author": "hypnagonia@gmail.com",
   "license": "ISC",
@@ -19,9 +20,9 @@
     "@harmony-js/core": "^0.1.52",
     "@harmony-js/crypto": "^0.1.6",
     "@sentry/node": "^5.22.3",
+    "@types/jest": "^26.0.22",
     "axios": "^0.19.2",
     "body-parser": "^1.19.0",
-    "cbor": "^7.0.5",
     "commander": "^7.2.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
@@ -33,6 +34,7 @@
     "grpc-tools": "^1.8.1",
     "http-status-codes": "^1.4.0",
     "install": "^0.13.0",
+    "jest": "^26.6.3",
     "node-fetch": "^2.6.1",
     "ora": "^5.4.0",
     "typescript-eslint": "0.0.1-alpha.0",

@@ -26,7 +26,7 @@ export const clone = async (githubUrl, directory, commitHash) => {
   }
 
   execSync(`git clone ${actualUrl} ${directory} 2>&1`)
-  if (commitHash != undefined) {
+  if (commitHash) {
     console.log('Switching to commit')
     execSync(`cd ${directory} && git checkout ${commitHash} 2>&1`)
   }

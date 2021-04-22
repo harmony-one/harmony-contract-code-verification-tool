@@ -10,6 +10,7 @@ program
       const verify = require( "./verification/index" ).codeVerification
       let res = await Promise.resolve(verify(args))
       console.table(res)
+      return res
       }
   })
   .requiredOption("-ca, --contractAddress <contractAddress>", "The address of the contract")
@@ -20,4 +21,4 @@ program
   .requiredOption("-c, --chainType <chainType>", "Chain type, for example, testnet or mainnet")
   .alias("v")
   .usage("command <options>")
-  .parse()
+  .parseAsync()

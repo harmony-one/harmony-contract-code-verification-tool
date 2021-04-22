@@ -45,7 +45,21 @@ Options:
 
 Run the below to verify a contract:
 ```bash
-yarn start verify --contractAddress one16skweach8tqt0ce4a3x8jtuz0gtrn374vul3ua --githubURL https://github.com/harmony-one/metacoin-box/blob/master/contracts/MetaCoin.sol --chainType testnet --solidityVersion 0.5.16
+yarn start verify --contractAddress one1rcs4yy4kln53ux60qdeuhhvpygn2sutn500dhw --githubURL https://github.com/rachit2501/Lottery-System/blob/master/contracts/Lottery.sol --chainType testnet --solidityVersion 0.4.17
+
+✔ Got actual bytecode from the blockhain
+✔ Github repository cloned
+✔ Truffle configuration ready
+✔ Contract dependencies installed
+✔ Compiling complete
+✔ Obtained compiled bytecode
+✔ Cloned repository deleted
+┌────────────┬────────────────────────────────────────────┐
+│  (index)   │                   Values                   │
+├────────────┼────────────────────────────────────────────┤
+│  verified  │                    true                    │
+│ commitHash │ '24a3fdafc47e6798c38673a33d85e99ebd4c192f' │
+└────────────┴────────────────────────────────────────────┘
 ```
 
 ## Tests

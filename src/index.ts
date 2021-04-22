@@ -15,7 +15,7 @@ program
   })
   .requiredOption("-ca, --contractAddress <contractAddress>", "The address of the contract")
   .requiredOption("-sv, --solidityVersion <solidityVersion>", "The version of the Solidity compiler which was used to compile the contract (at deployment)")
-  .requiredOption("-gu, --githubURL <githubURL>", "Github Repository URL")
+  .requiredOption("-gu, --githubURL <githubURL>", "Github Repository URL, up to and including the *.sol file")
   .option("-ch, --commitHash <commitHash>", "(optional) Hash of the commit to check out")
   .option("-k, --keep", "(optional,default=false) Keep the Github repository after the process")
   .requiredOption("-c, --chainType <chainType>", "Chain type, for example, testnet or mainnet")

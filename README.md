@@ -1,4 +1,4 @@
-# Harmony-One Contract Verification Tool
+# Harmony Contract Verification Tool
 
 A verification contract tool which compares byte code written on an address with byte code compiled by the tool from source code provided as a Github link to a .sol file
 

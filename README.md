@@ -5,9 +5,11 @@ A verification contract tool which compares byte code written on an address with
 ## Dependencies
 
 Install the dependencies first before running the tool locally
-```yarn
+```
+yarn
 npm
-truffle```
+truffle
+```
 
 ```bash
 sudo apt install npm

@@ -1,6 +1,6 @@
 import * as github from './github'
 import * as truffle from './truffle'
-import * as rpc from './rpc'
+import { getSmartContractCode } from './rpc'
 import path from 'path'
 import fs from 'fs'
 import { verifyByteCode } from './verify'
@@ -32,7 +32,8 @@ export const codeVerification = async (
   // todo validate if folder already exist
 
   let spinner = ora('Getting actual bytecode from the blockchain...').start()
-  const actualBytecode = await rpc.getSmartContractCode(chainType, contractAddress)
+  let actualBytecode = await getSmartContractCode(chainType, contractAddress)
+  actualBytecode = actualBytecode.result
   if (!actualBytecode || actualBytecode === '0x') {
     spinner.stop()
     throw new Error(`No bytecode found for address ${contractAddress}`)
@@ -44,7 +45,7 @@ export const codeVerification = async (
     await github.clone(githubURL, directory, commitHash)
   } catch (e) {
     spinner.stop()
-    process.exit(1)
+    return {verified: false, error: e}
   }
   spinner.succeed('Github repository cloned')
 
@@ -76,7 +77,7 @@ export const codeVerification = async (
   }
 
   } catch(error) {
-    console.error(error)
+    console.log(error)
     cleanUp(directory, keep)
     return {
       verified: false,

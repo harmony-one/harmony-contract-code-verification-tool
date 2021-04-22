@@ -45,8 +45,20 @@ Options:
 
 Run the below to verify a contract:
 ```bash
-yarn start verify --contractAddress one1rcs4yy4kln53ux60qdeuhhvpygn2sutn500dhw --githubURL https://github.com/rachit2501/Lottery-System/blob/master/contracts/Lottery.sol --chainType testnet --solidityVersion 0.4.17
+yarn start verify --contractAddress one16skweach8tqt0ce4a3x8jtuz0gtrn374vul3ua --githubURL https://github.com/harmony-one/metacoin-box/blob/master/contracts/MetaCoin.sol --chainType testnet --solidityVersion 0.5.16
 ```
 
 ## Tests
 Simply run ```yarn test test/test.js --collectCoverage``` to view test coverage and results
+```
+------------|---------|----------|---------|---------|-------------------
+File        | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+------------|---------|----------|---------|---------|-------------------
+All files   |   98.48 |    92.86 |     100 |   98.47 |                   
+ github.ts  |   90.91 |       80 |     100 |   90.91 | 13,17             
+ index.ts   |     100 |      100 |     100 |     100 |                   
+ rpc.ts     |     100 |      100 |     100 |     100 |                   
+ truffle.ts |     100 |      100 |     100 |     100 |                   
+ verify.ts  |     100 |      100 |     100 |     100 |                   
+------------|---------|----------|---------|---------|-------------------
+```

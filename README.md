@@ -1,9 +1,7 @@
 # Harmony Contract Verification Tool
-
 A verification contract tool which compares byte code written on an address with byte code compiled by the tool from source code provided as a Github link to a .sol file
 
 ## Dependencies
-
 Install the (global) dependencies
 ```
 yarn
@@ -17,7 +15,6 @@ sudo npm install --global npm yarn truffle
 ```
 
 ## Installation
-
 Once the dependencies are installed, clone the repository and do a ``yarn build``
 ```bash
 git clone https://github.com/MaxMustermann2/harmony-contract-code-verification-tool.git
@@ -26,7 +23,7 @@ yarn
 yarn build
 ```
 
-## Usage
+## CLI Usage
 Run ```yarn start --help``` to see the help options
 ```
 Usage:  verify|v command <options>
@@ -60,6 +57,20 @@ yarn start verify --contractAddress one1rcs4yy4kln53ux60qdeuhhvpygn2sutn500dhw -
 │  verified  │                    true                    │
 │ commitHash │ '24a3fdafc47e6798c38673a33d85e99ebd4c192f' │
 └────────────┴────────────────────────────────────────────┘
+```
+
+## Importing
+```
+const verify = require( "./src/verification/index" ).codeVerification
+verified = await verify(
+  {
+    contractAddress: 'one1rcs4yy4kln53ux60qdeuhhvpygn2sutn500dhw',
+    githubURL: 'https://github.com/rachit2501/Lottery-System/blob/master/contracts/Lottery.sol',
+    chainType: 'testnet',
+    solidityVersion: '0.4.17',
+    keep: true
+  }
+).verified
 ```
 
 ## Tests

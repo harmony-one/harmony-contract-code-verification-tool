@@ -62,7 +62,7 @@ yarn start verify --contractAddress one1rcs4yy4kln53ux60qdeuhhvpygn2sutn500dhw -
 ## Importing
 ```
 const verify = require( "./src/verification/index" ).codeVerification
-verified = await verify(
+result = await verify(
   {
     contractAddress: 'one1rcs4yy4kln53ux60qdeuhhvpygn2sutn500dhw',
     githubURL: 'https://github.com/rachit2501/Lottery-System/blob/master/contracts/Lottery.sol',
@@ -70,7 +70,8 @@ verified = await verify(
     solidityVersion: '0.4.17',
     keep: true
   }
-).verified
+)
+verified = result.verified
 ```
 
 ## Tests

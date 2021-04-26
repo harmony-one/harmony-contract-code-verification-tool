@@ -11,7 +11,7 @@ export const verifyByteCode = (compiledByteCode: string, actualByteCode: string,
   }
   const compiledCBOR = compiledByteCode.slice(-(compiledCborSize+2)*2, -4);
   const actualCBOR = actualByteCode.slice(-(actualCborSize+2)*2, -4);
-  if(compiledCBOR == actualCBOR) return true;
+  if(compiledCBOR == actualCBOR) return compiledCborSize == actualCborSize;
   try {
     const compiledMeta = cbor.decode(compiledCBOR);
     const actualMeta = cbor.decode(actualCBOR);

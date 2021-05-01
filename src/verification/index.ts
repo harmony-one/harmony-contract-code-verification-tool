@@ -88,6 +88,6 @@ export const codeVerification = async (
   cleanUp(directory, keep)
   return {
     verified: false,
-    error: 'No match'
+    result: 'No match'
   }
 }

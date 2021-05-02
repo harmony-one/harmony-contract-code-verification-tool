@@ -30,7 +30,13 @@ export const installDependencies = async (directory) => {
 }
 
 export const compile = async (directory) => {
-  execSync(`cd ${directory} && truffle compile 2>&1`)
+  try {
+    execSync(`cd ${directory} && truffle compile 2>&1`)
+    return true
+  }
+  catch(e) {
+    return false
+  }
 }
 
 const renameFile = (filename, inExtension, outExtension) => {
@@ -47,9 +53,13 @@ export const getByteCode = async (githubUrl, directory) => {
   const abiFileName = renameFile(fileName, 'sol', 'json')
 
   const dir = path.join(directory, 'build', 'contracts', abiFileName)
-
-  const data = fs.readFileSync(dir).toString()
-
-  const { deployedBytecode, bytecode } = JSON.parse(data)
-  return { deployedBytecode, bytecode }
+  if (fs.existsSync(dir)) {
+    const data = fs.readFileSync(dir).toString()
+    const { deployedBytecode, bytecode } = JSON.parse(data)
+    return { deployedBytecode, bytecode }
+  } else {
+    const deployedBytecode = false
+    const bytecode = false
+    return { deployedBytecode, bytecode }
+  }
 }

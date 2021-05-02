@@ -35,7 +35,7 @@ export const codeVerification = async (
   let actualBytecode = await getSmartContractCode(chainType, contractAddress)
   actualBytecode = actualBytecode.result
   if (!actualBytecode || actualBytecode === '0x') {
-    spinner.stop()
+    spinner.fail('Could not fetch bytecode from chain')
     throw new Error(`No bytecode found for address ${contractAddress}`)
   }
   spinner.succeed('Got actual bytecode from the blockhain')
@@ -49,7 +49,7 @@ export const codeVerification = async (
   }
   spinner.succeed('Github repository cloned')
 
-  spinner = ora('Creating tuffle configuration...').start()
+  spinner = ora('Creating truffle configuration...').start()
   await truffle.createConfiguration(solidityVersion, directory)
   spinner.succeed('Truffle configuration ready')
 
@@ -58,11 +58,28 @@ export const codeVerification = async (
   spinner.succeed('Contract dependencies installed')
 
   spinner = ora('Compiling...').start()
-  await truffle.compile(directory)
-  spinner.succeed('Compiling complete')
+  let success = await truffle.compile(directory)
+  if (success) {
+    spinner.succeed('Compiling complete')
+  } else {
+    spinner.fail('Compilation was not successful')
+    cleanUp(directory, keep)
+    return {
+      verified: false,
+      error: 'Compilation failed; please check for dependencies'
+    }
+  }
 
   spinner = ora('Getting compiled bytecode...').start()
   const { deployedBytecode, bytecode } = await truffle.getByteCode(githubURL, directory)
+  if (deployedBytecode === false) {
+    spinner.fail('Could not fetch compiled bytecode')
+    cleanUp(directory, keep)
+    return {
+      verified: false,
+      error: 'Compiled bytecode not found; does the sol file exist in the repo?'
+    }
+  }
   spinner.succeed('Obtained compiled bytecode')
 
   const verified = verifyByteCode(actualBytecode, deployedBytecode, solidityVersion)

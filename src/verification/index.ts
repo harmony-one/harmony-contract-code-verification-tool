@@ -1,16 +1,27 @@
 import * as github from './github'
 import * as truffle from './truffle'
-import * as rpc from './rpc'
+import { getSmartContractCode } from './rpc'
 import path from 'path'
 import fs from 'fs'
 import { verifyByteCode } from './verify'
+const ora = require("ora")
+
+function cleanUp(directory, keep) {
+  if (keep == true)
+    return
+  let spinner = ora('Cleaning up cloned repository...').start()
+  fs.rmdirSync(directory, {recursive: true})
+  spinner.succeed('Cloned repository deleted')
+}
 
 export const codeVerification = async (
   {
     contractAddress,
     solidityVersion,
     githubURL,
-    chain
+    commitHash,
+    keep,
+    chainType
   }
 ) => {
   const taskId = contractAddress
@@ -20,55 +31,80 @@ export const codeVerification = async (
   // todo validate address SDK hmy isAddress
   // todo validate if folder already exist
 
-  console.log('New task', { taskId, directory })
-
-  console.log('Getting actual bytecode from the blockchain...')
-  const actualBytecode = await rpc.getSmartContractCode(chain, contractAddress)
-
+  let spinner = ora('Getting actual bytecode from the blockchain...').start()
+  let actualBytecode = await getSmartContractCode(chainType, contractAddress)
+  actualBytecode = actualBytecode.result
   if (!actualBytecode || actualBytecode === '0x') {
+    spinner.fail('Could not fetch bytecode from chain')
     throw new Error(`No bytecode found for address ${contractAddress}`)
   }
+  spinner.succeed('Got actual bytecode from the blockhain')
 
-  console.log('Cloning github...')
+  spinner = ora('Cloning smart contract Github repository...').start()
   try {
-    await github.clone(githubURL, taskId)
-    console.log('Creating truffle config...')
+    await github.clone(githubURL, directory, commitHash)
   } catch (e) {
-    // console.warn(e)
+    spinner.stop()
+    return {verified: false, error: e}
+  }
+  spinner.succeed('Github repository cloned')
+
+  spinner = ora('Creating truffle configuration...').start()
+  await truffle.createConfiguration(solidityVersion, directory)
+  spinner.succeed('Truffle configuration ready')
+
+  spinner = ora('Installing contract dependencies...').start()
+  await truffle.installDependencies(directory)
+  spinner.succeed('Contract dependencies installed')
+
+  spinner = ora('Compiling...').start()
+  let success = await truffle.compile(directory)
+  if (success) {
+    spinner.succeed('Compiling complete')
+  } else {
+    spinner.fail('Compilation was not successful')
+    cleanUp(directory, keep)
+    return {
+      verified: false,
+      error: 'Compilation failed; please check for dependencies'
+    }
   }
 
-  await truffle.createConfiguration(solidityVersion, directory)
-  // await truffle.createMigration(directory, githubURL)
-  console.log('Installing contract dependencies...')
-  await truffle.installDependencies(directory)
-  console.log('Compiling...')
-  await truffle.compile(directory)
-  console.log('Getting compiled bytecode')
+  spinner = ora('Getting compiled bytecode...').start()
   const { deployedBytecode, bytecode } = await truffle.getByteCode(githubURL, directory)
+  if (deployedBytecode === false) {
+    spinner.fail('Could not fetch compiled bytecode')
+    cleanUp(directory, keep)
+    return {
+      verified: false,
+      error: 'Compiled bytecode not found; does the sol file exist in the repo?'
+    }
+  }
+  spinner.succeed('Obtained compiled bytecode')
 
-  console.log('Cleaning up...')
   const verified = verifyByteCode(actualBytecode, deployedBytecode, solidityVersion)
 
   if (verified) {
-    const commitHash = await github.getCommitHash(directory)
-
+    const commitHashCalculated = await github.getCommitHash(directory)
+    cleanUp(directory, keep)
     return {
-      verified,
-      commitHash
+      verified: true,
+      commitHash: commitHashCalculated
     }
   }
 
   } catch(error) {
+    console.log(error)
+    cleanUp(directory, keep)
     return {
       verified: false,
-      error
+      error: error
     }
   }
 
-  fs.rmdirSync(directory, { recursive: true })
-
+  cleanUp(directory, keep)
   return {
     verified: false,
-    error: 'No match'
+    result: 'No match'
   }
 }

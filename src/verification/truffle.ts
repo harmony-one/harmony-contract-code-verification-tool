@@ -12,7 +12,7 @@ const truffleConfig = (value) => {
       },
     },
   };
-  
+
   `
 }
 
@@ -20,18 +20,23 @@ export const createConfiguration = async (solidityVersion, directory) => {
   if (!solidityVersion) {
     throw new Error('No Solidity version specified')
   }
-  console.log(path.join(path.resolve(directory), 'truffle-config.js'))
   const config = truffleConfig(solidityVersion)
   fs.writeFileSync(path.join(path.resolve(directory), 'truffle-config.js'), config)
 }
 
 
 export const installDependencies = async (directory) => {
-  execSync(`cd ${directory} && yarn`)
+  execSync(`cd ${directory} && yarn 2>&1`)
 }
 
 export const compile = async (directory) => {
-  execSync(`cd ${directory} && truffle compile`)
+  try {
+    execSync(`cd ${directory} && truffle compile 2>&1`)
+    return true
+  }
+  catch(e) {
+    return false
+  }
 }
 
 const renameFile = (filename, inExtension, outExtension) => {
@@ -48,9 +53,13 @@ export const getByteCode = async (githubUrl, directory) => {
   const abiFileName = renameFile(fileName, 'sol', 'json')
 
   const dir = path.join(directory, 'build', 'contracts', abiFileName)
-
-  const data = fs.readFileSync(dir).toString()
-
-  const { deployedBytecode, bytecode } = JSON.parse(data)
-  return { deployedBytecode, bytecode }
+  if (fs.existsSync(dir)) {
+    const data = fs.readFileSync(dir).toString()
+    const { deployedBytecode, bytecode } = JSON.parse(data)
+    return { deployedBytecode, bytecode }
+  } else {
+    const deployedBytecode = false
+    const bytecode = false
+    return { deployedBytecode, bytecode }
+  }
 }
